@@ -1,6 +1,9 @@
 package deque;
 
 import org.junit.Test;
+
+import java.util.List;
+
 import static org.junit.Assert.*;
 
 
@@ -120,7 +123,7 @@ public class LinkedListDequeTest {
     public void bigLLDequeTest() {
 
         System.out.println("Make sure to uncomment the lines below (and delete this print statement).");
-        /*
+
         LinkedListDeque<Integer> lld1 = new LinkedListDeque<Integer>();
         for (int i = 0; i < 1000000; i++) {
             lld1.addLast(i);
@@ -134,7 +137,7 @@ public class LinkedListDequeTest {
             assertEquals("Should have the same value", i, (double) lld1.removeLast(), 0.0);
         }
 
-        */
+
     }
 
     @Test
@@ -147,5 +150,22 @@ public class LinkedListDequeTest {
         System.out.println(lis.get(5));
         System.out.println(lis.getRecursive(0));
         System.out.println(lis.getRecursive(5));
+        for (int i : lis) {
+            System.out.println(i);
+        }
+        Deque<Integer> lis2 = new LinkedListDeque<>();
+        lis2.addFirst(4);
+        lis2.addFirst(6);
+        lis2.addLast(7);
+        System.out.println(lis2.equals(lis));
+
+
+        ArrayDeque<String> str = new ArrayDeque<>();
+        str.addLast("apple");
+        str.addFirst("orange");
+        ArrayDeque<String> str2 = new ArrayDeque<>();
+        str2.addLast("apple");
+        str2.addFirst("orange");
+        System.out.println(str2.equals(str));
     }
 }

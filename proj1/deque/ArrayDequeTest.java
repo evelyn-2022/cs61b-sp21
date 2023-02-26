@@ -1,5 +1,6 @@
 package deque;
 
+import edu.princeton.cs.introcs.StdRandom;
 import org.junit.Test;
 
 
@@ -7,56 +8,49 @@ import static org.junit.Assert.*;
 
 public class ArrayDequeTest {
     @Test
-    public void Visualizer() {
+    public void randomMethodCall() {
         ArrayDeque<Integer> arr = new ArrayDeque<>();
-        arr.addLast(1);
-        System.out.println(arr.get(0));
-        arr.addLast(2);
-        arr.addFirst(3);
-        System.out.println(arr.get(0));
-        System.out.println(arr.get(1));
-        arr.addLast(4);
-        arr.addFirst(5);
-        System.out.println(arr.removeFirst());
-        arr.addFirst(6);
-        arr.addFirst(7);
-        arr.addFirst(8);
-        arr.addFirst(9);
-        arr.addLast(10);
-        arr.addLast(11);
-        arr.addFirst(1);
-        arr.addFirst(2);
-        arr.addFirst(3);
-        arr.addFirst(4);
-        arr.addFirst(5);
-        arr.addFirst(6);
-        arr.addFirst(7);
-        arr.addFirst(8);
-        arr.addFirst(9);
-        arr.addLast(10);
-        arr.addLast(11);
-        arr.removeFirst();
-        arr.removeFirst();
-        arr.removeFirst();
-        arr.removeFirst();
-        arr.removeFirst();
-        arr.removeFirst();
-        arr.removeFirst();
-        arr.removeFirst();
-        arr.removeLast();
-        arr.removeLast();
-        arr.removeLast();
-        arr.removeLast();
-        arr.removeLast();
-        arr.removeLast();
-        arr.removeLast();
-        arr.addFirst(1);
-        arr.addFirst(2);
-        arr.addFirst(3);
-        arr.addFirst(4);
-        arr.addFirst(5);
-        arr.addLast(10);
-        arr.addLast(11);
+        int s = 0;
+        StringBuilder errMsg = new StringBuilder();
+        for (int i = 0; i < 1000; i++) {
+            int intBetweenZeroAndFour = StdRandom.uniform(4);
+            switch (intBetweenZeroAndFour) {
+                case 0 -> {
+                    arr.addFirst(i);
+                    s++;
+                    errMsg.append("addFirst(%d)\n".formatted(i));
+                    assertEquals(s, arr.size());
+                    assertEquals(errMsg.toString(), i, (int) arr.get(0));
+                }
+                case 1 -> {
+                    arr.addLast(i);
+                    s++;
+                    errMsg.append("addLast(%d)\n".formatted(i));
+                    assertEquals(s, arr.size());
+                    assertEquals(errMsg.toString(), i, (int) arr.get(arr.size() - 1));
+                }
+                case 2 -> {
+                    if (arr.size() > 0) {
+                        int expected = arr.get(0);
+                        int removed = arr.removeFirst();
+                        s--;
+                        errMsg.append("removeFirst()\n");
+                        assertEquals(s, arr.size());
+                        assertEquals(errMsg.toString(), expected, removed);
+                    }
+                }
+                case 3 -> {
+                    if (arr.size() > 0) {
+                        int expected = arr.get(arr.size() - 1);
+                        int removed = arr.removeLast();
+                        s--;
+                        errMsg.append("removeLast()\n");
+                        assertEquals(s, arr.size());
+                        assertEquals(errMsg.toString(), expected, removed);
+                    }
+                }
+            }
+        }
     }
 }
 

@@ -1,11 +1,13 @@
 package deque;
 
-public class LinkedListDeque<T> implements Deque<T> {
+import java.util.Iterator;
+
+public class LinkedListDeque<T> implements Deque<T>, Iterable<T> {
     private class TNode {
-        public T item;
-        public TNode prev;
-        public TNode next;
-        public TNode(T item, TNode prev, TNode next) {
+        private T item;
+        private TNode prev;
+        private TNode next;
+        TNode(T item, TNode prev, TNode next) {
             this.item = item;
             this.prev = prev;
             this.next = next;
@@ -39,11 +41,6 @@ public class LinkedListDeque<T> implements Deque<T> {
     }
 
     @Override
-    public boolean isEmpty() {
-        return sentinel.next == sentinel;
-    }
-
-    @Override
     public int size() {
         return size;
     }
@@ -61,7 +58,9 @@ public class LinkedListDeque<T> implements Deque<T> {
     @Override
     public T removeFirst() {
         TNode first = sentinel.next;
-        if (first == sentinel) return null;
+        if (first == sentinel) {
+            return null;
+        }
 
         sentinel.next = first.next;
         first.next.prev = sentinel;
@@ -72,7 +71,9 @@ public class LinkedListDeque<T> implements Deque<T> {
     @Override
     public T removeLast() {
         TNode last = sentinel.prev;
-        if (last == sentinel) return null;
+        if (last == sentinel) {
+            return null;
+        }
 
         last.prev.next = sentinel;
         sentinel.prev = last.prev;
@@ -107,5 +108,57 @@ public class LinkedListDeque<T> implements Deque<T> {
         } else {
             return getNode(i + 1, n.next, index);
         }
+    }
+
+    @Override
+    public Iterator<T> iterator() {
+        return new LinkedListIterator();
+    }
+
+    private class LinkedListIterator implements Iterator<T> {
+        private int wizPos;
+
+        LinkedListIterator() {
+            wizPos = 0;
+        }
+
+        @Override
+        public boolean hasNext() {
+            return wizPos < size;
+        }
+
+        @Override
+        public T next() {
+            T returnItem = getRecursive(wizPos);
+            wizPos++;
+            return returnItem;
+        }
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+
+        if (o == null) {
+            return false;
+        }
+
+        if (!(o instanceof Deque)) {
+            return false;
+        }
+
+        Deque<T> obj = (Deque<T>) o;
+        if (obj.size() != this.size) {
+            return false;
+        }
+
+        for (int i = 0; i < size; i++) {
+            if (!obj.get(i).equals(this.get(i))) {
+                return false;
+            }
+        }
+        return true;
     }
 }

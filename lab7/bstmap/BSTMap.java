@@ -97,11 +97,12 @@ public class BSTMap<K extends Comparable<K>, V> implements Map61B<K, V> {
 
     @Override
     public V remove(K key) {
-        if (root == null) {
+        if (root == null || get(key) == null) {
             return null;
         }
         V returnVal = get(key);
         root = remove(root, key);
+        size -= 1;
         return returnVal;
     }
 

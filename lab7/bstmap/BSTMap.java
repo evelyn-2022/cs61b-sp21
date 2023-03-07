@@ -1,11 +1,15 @@
 package bstmap;
 
+import org.junit.Test;
+
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
 public class BSTMap<K extends Comparable<K>, V> implements Map61B<K, V> {
     private BSTNode<K, V> root;
     private int size = 0;
+    private HashSet<K> keySet = new HashSet<>();
 
     private class BSTNode<K extends Comparable<K>, V> {
         private K key;
@@ -17,22 +21,6 @@ public class BSTMap<K extends Comparable<K>, V> implements Map61B<K, V> {
             this.value = value;
             this.left = left;
             this.right = right;
-        }
-
-        private BSTNode<K, V> put(BSTNode<K, V> r, K key, V value) {
-            if (r == null) {
-                size += 1;
-                return new BSTNode<>(key, value, null, null);
-            }
-            int cmp = r.key.compareTo(key);
-            if (cmp > 0) {
-                r.left = put(r.left, key, value);
-            } else if (cmp < 0) {
-                r.right = put(r.right, key, value);
-            } else {
-                r.value = value;
-            }
-            return r;
         }
     }
 
@@ -83,10 +71,91 @@ public class BSTMap<K extends Comparable<K>, V> implements Map61B<K, V> {
     public void put(K key, V value) {
         if (root == null) {
             root = new BSTNode<>(key, value, null, null);
+            keySet.add(key);
             size += 1;
         } else {
-            root = root.put(root, key, value);
+            root = put(root, key, value);
         }
+    }
+
+    private BSTNode<K, V> put(BSTNode<K, V> r, K key, V value) {
+        if (r == null) {
+            size += 1;
+            keySet.add(key);
+            return new BSTNode<>(key, value, null, null);
+        }
+        int cmp = r.key.compareTo(key);
+        if (cmp > 0) {
+            r.left = put(r.left, key, value);
+        } else if (cmp < 0) {
+            r.right = put(r.right, key, value);
+        } else {
+            r.value = value;
+        }
+        return r;
+    }
+
+    @Override
+    public V remove(K key) {
+        if (root == null) {
+            return null;
+        }
+        V returnVal = get(key);
+        root = remove(root, key);
+        return returnVal;
+    }
+
+    private BSTNode<K, V> remove(BSTNode<K, V> r, K key) {
+        if (r == null) {
+            return null;
+        }
+        int cmp = r.key.compareTo(key);
+        if (cmp < 0) {
+            r.right = remove(r.right, key);
+        } else if (cmp > 0) {
+            r.left = remove(r.left, key);
+        } else {
+            if (r.right == null) {
+                return r.left;
+            }
+            if (r.left == null) {
+                return r.right;
+            }
+
+            BSTNode<K, V> n = r;
+            r = min(n.right);
+            r.right = deleteMin(n.right);
+            r.left = n.left;
+        }
+        return r;
+    }
+
+    private BSTNode<K, V> min(BSTNode<K, V> n) {
+        if (n.left == null) {
+            return n;
+        }
+        return min(n.left);
+    }
+
+    private BSTNode<K, V> deleteMin(BSTNode<K, V> n) {
+        if (n.left == null) {
+            return n.right;
+        }
+        n.left = deleteMin(n.left);
+        return n;
+    }
+
+    @Override
+    public V remove(K key, V value) {
+        if (root == null || !get(key).equals(value)) {
+            return null;
+        }
+        return remove(key);
+    }
+
+    @Override
+    public Iterator<K> iterator() {
+        throw new UnsupportedOperationException();
     }
 
     @Override
@@ -94,18 +163,9 @@ public class BSTMap<K extends Comparable<K>, V> implements Map61B<K, V> {
         throw new UnsupportedOperationException();
     }
 
-    @Override
-    public V remove(K key) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public V remove(K key, V value) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public Iterator<K> iterator() {
-        throw new UnsupportedOperationException();
+    public void printInOrder() {
+        for (K key : keySet) {
+            System.out.println("{" + key + ", " + get(key) + "}");
+        }
     }
 }

@@ -2,14 +2,15 @@ package bstmap;
 
 import org.junit.Test;
 
+import javax.swing.*;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
+import java.util.Stack;
 
 public class BSTMap<K extends Comparable<K>, V> implements Map61B<K, V> {
     private BSTNode<K, V> root;
     private int size = 0;
-    private HashSet<K> keySet = new HashSet<>();
 
     private class BSTNode<K extends Comparable<K>, V> {
         private K key;
@@ -71,7 +72,6 @@ public class BSTMap<K extends Comparable<K>, V> implements Map61B<K, V> {
     public void put(K key, V value) {
         if (root == null) {
             root = new BSTNode<>(key, value, null, null);
-            keySet.add(key);
             size += 1;
         } else {
             root = put(root, key, value);
@@ -81,7 +81,6 @@ public class BSTMap<K extends Comparable<K>, V> implements Map61B<K, V> {
     private BSTNode<K, V> put(BSTNode<K, V> r, K key, V value) {
         if (r == null) {
             size += 1;
-            keySet.add(key);
             return new BSTNode<>(key, value, null, null);
         }
         int cmp = r.key.compareTo(key);
@@ -156,17 +155,66 @@ public class BSTMap<K extends Comparable<K>, V> implements Map61B<K, V> {
 
     @Override
     public Iterator<K> iterator() {
-        throw new UnsupportedOperationException();
+        return new BSTMapIterator<>(root);
+    }
+
+    public class BSTMapIterator<K extends Comparable<K>, V> implements Iterator<K> {
+
+        private final Stack<BSTNode<K, V>> stack;
+
+        public BSTMapIterator(BSTNode<K, V> root) {
+            stack = new Stack<>();
+            pushLeftNodes(root);
+        }
+
+        @Override
+        public boolean hasNext() {
+            return !stack.isEmpty();
+        }
+
+        @Override
+        public K next() {
+            if (!hasNext()) {
+                throw new java.util.NoSuchElementException();
+            }
+            BSTNode<K, V> node = stack.pop();
+            pushLeftNodes(node.right);
+            return node.key;
+        }
+
+        private void pushLeftNodes(BSTNode<K, V> node) {
+            while (node != null) {
+                stack.push(node);
+                node = node.left;
+            }
+        }
+
     }
 
     @Override
     public Set<K> keySet() {
-        throw new UnsupportedOperationException();
+        HashSet<K> keySet = new HashSet<>();
+        return keySet(root, keySet);
+    }
+
+    private Set<K> keySet(BSTNode<K, V> n, HashSet<K> keySet) {
+        if (n != null) {
+            keySet(n.left, keySet);
+            keySet.add(n.key);
+            keySet(n.right, keySet);
+        }
+        return keySet;
     }
 
     public void printInOrder() {
-        for (K key : keySet) {
-            System.out.println("{" + key + ", " + get(key) + "}");
+        printInOrder(root);
+    }
+
+    private void printInOrder(BSTNode<K, V> n) {
+        if (n != null) {
+            printInOrder(n.left);
+            System.out.println("{" + n.key + ", " + n.value + "}");
+            printInOrder(n.right);
         }
     }
 }

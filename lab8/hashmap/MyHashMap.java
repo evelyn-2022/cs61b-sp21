@@ -109,10 +109,14 @@ public class MyHashMap<K, V> implements Map61B<K, V>, Iterable<K> {
         size = 0;
     }
 
+    private Collection<Node> getTargetBucket(K key) {
+        int hashCode = Math.floorMod(key.hashCode(), tableSize);
+        return buckets[hashCode];
+    }
+
     @Override
     public boolean containsKey(K key) {
-        int hashCode = Math.floorMod(key.hashCode(), tableSize);
-        Collection<Node> targetBucket = buckets[hashCode];
+        Collection<Node> targetBucket = getTargetBucket(key);
         for (Node node : targetBucket) {
             if (node.key.equals(key)) {
                 return true;
@@ -123,8 +127,7 @@ public class MyHashMap<K, V> implements Map61B<K, V>, Iterable<K> {
 
     @Override
     public V get(K key) {
-        int hashCode = Math.floorMod(key.hashCode(), tableSize);
-        Collection<Node> targetBucket = buckets[hashCode];
+        Collection<Node> targetBucket = getTargetBucket(key);
         for (Node n : targetBucket) {
             if (n.key.equals(key)) {
                 return n.value;
@@ -144,8 +147,7 @@ public class MyHashMap<K, V> implements Map61B<K, V>, Iterable<K> {
             resize(tableSize * 2);
         }
 
-        int hashCode = Math.floorMod(key.hashCode(), tableSize);
-        Collection<Node> targetBucket = buckets[hashCode];
+        Collection<Node> targetBucket = getTargetBucket(key);
         Node newNode = createNode(key, value);
 
         for (Node n : targetBucket) {
@@ -182,12 +184,21 @@ public class MyHashMap<K, V> implements Map61B<K, V>, Iterable<K> {
 
     @Override
     public V remove(K key) {
-        return null;
+        if (!containsKey(key)) {
+            return null;
+        }
+        return remove(key, get(key));
     }
 
     @Override
     public V remove(K key, V value) {
-        throw new UnsupportedOperationException();
+        if (!containsKey(key) || !get(key).equals(value)) {
+            return null;
+        }
+        Collection<Node> targetBucket = getTargetBucket(key);
+        targetBucket.removeIf(n -> n.key.equals(key));
+        size--;
+        return value;
     }
 
     @Override
@@ -214,17 +225,6 @@ public class MyHashMap<K, V> implements Map61B<K, V>, Iterable<K> {
         @Override
         public K next() {
             return iterator.next().key;
-        }
-    }
-
-    public static void main(String[] args) {
-        MyHashMap<String, Integer> mymap = new MyHashMap<>();
-        for (int i = 0; i < 3; i++) {
-            mymap.put("i" + i, i);
-        }
-
-        for (String item : mymap) {
-            System.out.println("Key: " + item + ", value: " + mymap.get(item));
         }
     }
 }

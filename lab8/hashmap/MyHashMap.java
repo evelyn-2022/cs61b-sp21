@@ -203,10 +203,10 @@ public class MyHashMap<K, V> implements Map61B<K, V> {
 
     @Override
     public Iterator<K> iterator() {
-        return new hashMapIterator();
+        return new HashMapIterator();
     }
 
-    private class hashMapIterator implements Iterator<K> {
+    private class HashMapIterator implements Iterator<K> {
         int index = 0;
         Iterator<Node> iterator = buckets[0].iterator();
 
